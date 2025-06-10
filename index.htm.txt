@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zonvoordeel.nl - A-merken, B-prijzen</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://css.gg/css?=&name=trash|close" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        body, html {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #212529;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        h1, h2, h3, h4, h5, h6, .font-sans {
+            font-family: 'Inter', sans-serif;
+        }
+        .nav-link.active {
+            color: #FF6B6B;
+            font-weight: 700;
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .fade-in { animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-shadow-lg { text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+
+        .product-card { 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+            border: 1px solid #eee;
+        }
+        .product-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 30px -10px rgb(0 0 0 / 0.15);
+        }
+        
+        .hero-bg-zoom { animation: zoom-in-out 30s ease-in-out infinite; }
+        @keyframes zoom-in-out {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        #product-modal-overlay { 
+            background-color: rgba(0, 0, 0, 0.6); 
+            backdrop-filter: blur(5px); 
+            transition: opacity 0.3s ease;
+        }
+
+        .quantity-selector button:hover { background-color: #f0f0f0; }
+        
+        /* Chatbot styling */
+        .chat-bubble-user, .chat-bubble-ai {
+            overflow-wrap: break-word; /* Fix for text overflowing */
+            word-wrap: break-word;     /* Legacy fallback */
+            line-height: 1.5;
+        }
+        .chat-bubble-user { background-color: #FF6B6B; color: white; }
+        .chat-bubble-ai { background-color: #E9E9EB; }
+        .typing-indicator span {
+            height: 8px; width: 8px; background-color: #9CA3AF;
+            border-radius: 50%; display: inline-block;
+            animation: a-b 1s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes a-b {
+            0%, 100% { opacity: 0.3; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .suggestion-chip { transition: background-color 0.2s; }
+
+        /* Checkout Page styling */
+        .checkout-input {
+            @apply w-full rounded-md border-gray-300 bg-white py-2.5 pl-4 pr-12 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500;
+        }
+        .payment-option {
+            @apply flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 text-sm font-medium shadow-sm hover:border-gray-300 cursor-pointer transition-all;
+        }
+        .payment-option[aria-checked='true'] {
+            @apply border-blue-600 ring-2 ring-blue-600;
+        }
+        /* Address suggestion styling */
+        .address-suggestion {
+            @apply block w-full cursor-pointer p-3 text-left text-sm text-gray-700 hover:bg-gray-100;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- HEADER -->
+    <header id="main-header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center space-x-2 nav-link" data-page="home">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                    <span class="text-2xl font-extrabold text-[#212529]">Zonvoordeel</span>
+                </a>
+
+                <!-- Desktop Navigatie -->
+                <nav class="hidden md:flex items-center space-x-8 text-base font-semibold text-gray-600">
+                    <a href="#" class="nav-link active" data-page="home">Home</a>
+                    <a href="#" class="nav-link" data-page="categorie" data-category="Gezicht">Gezicht</a>
+                    <a href="#" class="nav-link" data-page="categorie" data-category="Lichaam">Lichaam</a>
+                    <a href="#" class="nav-link" data-page="categorie" data-category="Kinderen">Kinderen</a>
+                    <a href="#" class="nav-link" data-page="over-ons">Over Ons</a>
+                </nav>
+
+                <!-- Icoontjes -->
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="relative nav-link" data-page="winkelwagen">
+                        <i data-lucide="shopping-cart" class="text-gray-700 hover:text-[#FF6B6B] transition-colors"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF6B6B] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </a>
+                    <button id="mobile-menu-button" class="md:hidden">
+                        <i data-lucide="menu"></i>
+                    </button>
+                </div>
+            </div>
+             <!-- Mobile Navigatie -->
+            <div id="mobile-menu" class="hidden md:hidden py-4">
+                <nav class="flex flex-col space-y-4 text-center">
+                    <a href="#" class="nav-link active" data-page="home">Home</a>
+                    <a href="#" class="nav-link" data-page="categorie" data-category="Gezicht">Gezicht</a>
+                    <a href="#" class="nav-link" data-page="categorie" data-category="Lichaam">Lichaam</a>
+                    <a href="#" class="nav-link" data-page="categorie" data-category="Kinderen">Kinderen</a>
+                    <a href="#" class="nav-link" data-page="over-ons">Over Ons</a>
+                    <a href="#" class="nav-link" data-page="winkelwagen">Winkelwagen</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main id="main-content" class="container mx-auto px-4 py-8 md:py-12 min-h-screen">
+        
+        <!-- === HOME PAGINA === -->
+        <div id="home-page" class="page active fade-in">
+            <!-- Hero Sectie -->
+            <section class="relative rounded-2xl overflow-hidden bg-gray-800 h-[60vh] min-h-[450px] flex items-center">
+                <img src="https://images.pexels.com/photos/3762465/pexels-photo-3762465.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" class="hero-bg-zoom absolute inset-0 w-full h-full object-cover opacity-50" alt="Vrouw op het strand met zonnebrand">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                <div class="relative z-10 text-center mx-auto px-4">
+                    <h1 class="text-4xl md:text-6xl font-extrabold text-white text-shadow-lg leading-tight">A-merken, B-prijzen.</h1>
+                    <p class="mt-4 text-lg md:text-xl text-white font-medium max-w-2xl mx-auto text-shadow-lg">De slimste bescherming onder de zon. Kwaliteit voor een prijs die je blij maakt.</p>
+                    <button class="nav-link mt-8 bg-[#FF6B6B] text-white font-bold py-4 px-8 rounded-full text-lg hover:bg-red-500 transform hover:scale-105 transition-all duration-300 shadow-xl" data-page="deals">
+                        Bekijk alle deals
+                    </button>
+                </div>
+            </section>
+
+            <!-- Waarom Zonvoordeel Sectie -->
+            <section class="py-16">
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                    <div class="flex flex-col items-center">
+                        <div class="bg-[#A8DADC]/50 rounded-full p-4 mb-4"><i data-lucide="shield-check" class="w-8 h-8 text-[#212529]"></i></div>
+                        <h3 class="font-bold text-xl mb-2">Alleen A-merken</h3>
+                        <p class="text-gray-600">Wij verkopen alleen de beste, vertrouwde merken voor optimale bescherming.</p>
+                    </div>
+                     <div class="flex flex-col items-center">
+                        <div class="bg-[#FF6B6B]/50 rounded-full p-4 mb-4"><i data-lucide="tag" class="w-8 h-8 text-[#212529]"></i></div>
+                        <h3 class="font-bold text-xl mb-2">Gegarandeerd de laagste prijs</h3>
+                        <p class="text-gray-600">Door slim inkopen profiteer jij altijd van de scherpste deals.</p>
+                    </div>
+                     <div class="flex flex-col items-center">
+                         <div class="bg-[#F7DDA4]/80 rounded-full p-4 mb-4"><i data-lucide="truck" class="w-8 h-8 text-[#212529]"></i></div>
+                        <h3 class="font-bold text-xl mb-2">Snel in huis</h3>
+                        <p class="text-gray-600">Voor 22:00 besteld, is de volgende werkdag al smeren!</p>
+                    </div>
+                 </div>
+            </section>
+
+            <!-- Top Deals Sectie -->
+            <section class="py-12">
+                <h2 class="text-3xl font-bold text-center mb-10">Onze Top Deals</h2>
+                <div id="top-deals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Producten worden hier via JS ingeladen -->
+                </div>
+            </section>
+            
+            <!-- Klantreviews Sectie -->
+            <section class="py-16 bg-white rounded-3xl">
+                <h2 class="text-3xl font-bold text-center mb-10">Wat onze klanten zeggen</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Review 1 -->
+                    <div class="p-8 border border-gray-100 rounded-2xl">
+                        <div class="flex text-yellow-400 mb-2">
+                            <i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i>
+                        </div>
+                        <p class="text-gray-600 mb-4 italic">"Echt topservice! Snel geleverd en de prijzen zijn onverslaanbaar. Ik bestel nergens anders meer."</p>
+                        <p class="font-bold">- Sanne de Vries</p>
+                    </div>
+                    <!-- Review 2 -->
+                    <div class="p-8 border border-gray-100 rounded-2xl">
+                         <div class="flex text-yellow-400 mb-2">
+                            <i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i>
+                        </div>
+                        <p class="text-gray-600 mb-4 italic">"De chatbot Zonny hielp me perfect bij het kiezen van een zonnebrand voor mijn gevoelige huid. Heel handig!"</p>
+                        <p class="font-bold">- Mark Jansen</p>
+                    </div>
+                    <!-- Review 3 -->
+                    <div class="p-8 border border-gray-100 rounded-2xl">
+                         <div class="flex text-yellow-400 mb-2">
+                            <i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i><i data-lucide="star" class="fill-current"></i><i data-lucide="star"></i>
+                        </div>
+                        <p class="text-gray-600 mb-4 italic">"Fijne webshop met een groot aanbod. De checkout ging super soepel met het automatische adres invullen."</p>
+                        <p class="font-bold">- Lisa van den Berg</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- === ALLE DEALS PAGINA === -->
+        <div id="deals-page" class="page">
+            <h1 class="text-4xl font-bold mb-8 text-center">Alle Deals</h1>
+            <p class="text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto">Hier vind je ons complete assortiment van A-merk zonnebrand, altijd voor de beste prijs.</p>
+            <div id="deals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Producten worden hier dynamisch geladen -->
+            </div>
+        </div>
+
+        <!-- === CATEGORIE PAGINA === -->
+        <div id="categorie-page" class="page">
+            <h1 id="categorie-title" class="text-4xl font-bold mb-8 text-center">Categorie</h1>
+            <p class="text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto">Alle producten binnen deze categorie.</p>
+            <div id="categorie-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Producten worden hier dynamisch geladen -->
+            </div>
+        </div>
+        
+        <!-- === OVER ONS PAGINA === -->
+        <div id="over-ons-page" class="page">
+            <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-lg">
+                <h1 class="text-4xl font-bold mb-6 text-center">Ons Verhaal</h1>
+                <div class="prose prose-lg max-w-none text-gray-700">
+                    <p><strong>Zonvoordeel.nl</strong> is geboren uit een simpele gedachte: de beste bescherming voor je huid hoeft niet de hoofdprijs te kosten. We waren het zat om te veel te betalen voor kwalitatieve zonnebrandcrèmes van merken die we vertrouwen.</p>
+                    <p>Daarom zijn we begonnen met een missie: de beste partijen A-merk zonnebrand opsporen en deze aanbieden voor een prijs waar je echt blij van wordt. Of je nu op vakantie gaat, een dagje naar het park of gewoon dagelijks je huid wilt beschermen, wij vinden dat iedereen toegang moet hebben tot de beste producten zonder compromissen.</p>
+                    <p class="mt-8 text-center font-bold text-lg text-[#FF6B6B]">De slimste bescherming onder de zon, dat is onze belofte.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- === WINKELWAGEN PAGINA === -->
+        <div id="winkelwagen-page" class="page">
+             <h1 class="text-4xl font-bold mb-8 text-center">Jouw Winkelwagen</h1>
+             <div id="cart-items-container" class="max-w-4xl mx-auto">
+                <!-- Winkelwagen items worden hier dynamisch ingeladen -->
+             </div>
+        </div>
+
+        <!-- === CHECKOUT PAGINA === -->
+        <div id="checkout-page" class="page">
+            <div class="mb-6">
+                 <button class="nav-link inline-flex items-center text-gray-600 hover:text-black" data-page="winkelwagen">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                    Terug naar winkelwagen
+                 </button>
+            </div>
+            <div class="grid grid-cols-1 gap-x-12 lg:grid-cols-2">
+                <div class="rounded-lg bg-white p-6 sm:p-8 shadow-lg">
+                    <h2 class="text-2xl font-bold mb-6">Contact & Levering</h2>
+                    <form class="space-y-6">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">E-mailadres</label>
+                            <input type="email" id="email" class="checkout-input mt-1" placeholder="jij@voorbeeld.com">
+                        </div>
+                        <fieldset>
+                            <legend class="text-sm font-medium text-gray-700">Verzendadres</legend>
+                            <div class="mt-2 space-y-4">
+                                <input type="text" id="checkout-name" placeholder="Voor- en achternaam" class="checkout-input">
+                                <div class="relative">
+                                    <input type="text" id="checkout-address" placeholder="Adres en huisnummer" class="checkout-input">
+                                    <div id="address-suggestions" class="absolute z-10 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg hidden"></div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <input type="text" id="checkout-postcode" placeholder="Postcode" class="checkout-input">
+                                    <input type="text" id="checkout-plaats" placeholder="Woonplaats" class="checkout-input">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend class="text-sm font-medium text-gray-700">Betaalmethode</legend>
+                            <div id="payment-options-container" class="mt-2 space-y-4">
+                                <!-- iDEAL -->
+                                <div class="payment-option" tabindex="0" role="radio" aria-checked="true">
+                                    <p class="text-gray-700 font-medium">iDEAL</p>
+                                    <i data-lucide="circle-dot" class="text-blue-600"></i>
+                                </div>
+                                <!-- Credit Card -->
+                                <div class="payment-option" tabindex="0" role="radio" aria-checked="false">
+                                     <div class="flex items-center space-x-4">
+                                         <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.svg" class="h-4" alt="Visa">
+                                         <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg" class="h-6" alt="Mastercard">
+                                     </div>
+                                     <p class="text-gray-700 font-medium">Creditcard</p>
+                                     <i data-lucide="circle" class="text-gray-400"></i>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <button type="submit" class="flex w-full items-center justify-center space-x-2 rounded-lg border border-transparent bg-gradient-to-r from-green-500 to-green-600 px-8 py-3 text-lg font-bold text-white shadow-lg hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105">
+                           <i data-lucide="lock" class="h-5 w-5"></i>
+                           <span>Bestelling Plaatsen</span>
+                        </button>
+                    </form>
+                </div>
+                <div class="py-12 lg:py-0">
+                    <h2 class="text-2xl font-bold mb-6">Overzicht van je bestelling</h2>
+                    <div id="checkout-summary" class="space-y-4">
+                        <!-- Checkout summary wordt hier via JS geladen -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === CONTACT PAGINA === -->
+        <div id="contact-page" class="page">
+            <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-lg">
+                <h1 class="text-4xl font-bold mb-6 text-center">Neem Contact Op</h1>
+                <div class="prose prose-lg max-w-none text-gray-700">
+                    <p>Heb je een vraag over je bestelling, een product, of iets anders? We helpen je graag! De snelste manier om een antwoord te krijgen is via onze slimme chatbot Zonny, rechtsonder op de pagina.</p>
+                    <p>Kom je er met Zonny niet uit? Stuur ons dan een e-mail op <a href="mailto:klantenservice@zonvoordeel.nl" class="text-[#FF6B6B]">klantenservice@zonvoordeel.nl</a>. We streven ernaar om je bericht binnen 24 uur te beantwoorden.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- === VERZENDING & RETOUR PAGINA === -->
+        <div id="verzending-page" class="page">
+            <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-lg">
+                <h1 class="text-4xl font-bold mb-6 text-center">Verzending & Retour</h1>
+                <div class="prose prose-lg max-w-none text-gray-700">
+                    <h3 class="font-bold">Verzending</h3>
+                    <p>Voor 22:00 besteld, is de volgende werkdag in huis! We verzenden al onze pakketjes met PostNL. De verzendkosten bedragen €4,95 per bestelling. Bij bestellingen boven de €50 is de verzending gratis.</p>
+                    <h3 class="font-bold mt-8">Retourneren</h3>
+                    <p>Ben je toch niet helemaal tevreden met je aankoop? Geen probleem. Je kunt je bestelling binnen 14 dagen na ontvangst retourneren, mits de producten ongebruikt en in de originele, onbeschadigde verpakking zitten. Stuur een mail naar <a href="mailto:klantenservice@zonvoordeel.nl" class="text-[#FF6B6B]">klantenservice@zonvoordeel.nl</a> om je retour aan te melden.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- === FAQ PAGINA === -->
+        <div id="faq-page" class="page">
+            <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-lg">
+                <h1 class="text-4xl font-bold mb-6 text-center">Veelgestelde Vragen</h1>
+                <div class="prose prose-lg max-w-none text-gray-700 space-y-6">
+                    <div>
+                        <h3 class="font-bold">1. Welke SPF moet ik kiezen?</h3>
+                        <p>Dat hangt af van je huidtype en de zonkracht. Voor dagelijks gebruik in Nederland is SPF 15 of 30 vaak voldoende. Ga je op zonvakantie of heb je een lichte huid? Kies dan voor SPF 50 of 50+. Onze chatbot Zonny kan je hier perfect bij helpen!</p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold">2. Zijn jullie producten dierproefvrij?</h3>
+                        <p>Wij verkopen alleen A-merken die zich houden aan de Europese wetgeving, wat betekent dat de eindproducten niet op dieren zijn getest. Voor specifieke vragen over het beleid van een merk, verwijzen we je naar de website van het merk zelf.</p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold">3. Hoe kan het dat jullie zo goedkoop zijn?</h3>
+                        <p>Wij kopen slim in! We kopen grote partijen zonnebrandproducten op, bijvoorbeeld van overproductie of wanneer een verpakking licht verandert. Zo kunnen we jou A-merken aanbieden voor absolute bodemprijzen. Alle producten zijn uiteraard van de hoogste kwaliteit en hebben een ruime houdbaarheidsdatum.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer id="main-footer" class="bg-white border-t border-gray-200 mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Zonvoordeel.nl</h4>
+                    <p class="text-gray-600">A-merken, B-prijzen. Jouw slimme keuze voor de beste zonbescherming.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Klantenservice</h4>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><a href="#" class="nav-link hover:text-[#FF6B6B]" data-page="contact">Contact</a></li>
+                        <li><a href="#" class="nav-link hover:text-[#FF6B6B]" data-page="verzending">Verzending & Retour</a></li>
+                        <li><a href="#" class="nav-link hover:text-[#FF6B6B]" data-page="faq">Veelgestelde Vragen</a></li>
+                    </ul>
+                </div>
+                 <div>
+                    <h4 class="font-bold text-lg mb-4">Shop</h4>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><a href="#" class="nav-link hover:text-[#FF6B6B]" data-page="categorie" data-category="Gezicht">Gezicht</a></li>
+                        <li><a href="#" class="nav-link hover:text-[#FF6B6B]" data-page="categorie" data-category="Lichaam">Lichaam</a></li>
+                        <li><a href="#" class="nav-link hover:text-[#FF6B6B]" data-page="categorie" data-category="Kinderen">Kinderen</a></li>
+                        <li><a href="#" class="nav-link hover:text-[#FF6B6B]" data-page="categorie" data-category="Aftersun">Aftersun</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Blijf op de hoogte</h4>
+                    <p class="text-gray-600 mb-4">Meld je aan en mis geen enkele deal!</p>
+                    <form class="flex items-center">
+                        <input type="email" placeholder="Jouw e-mailadres" class="flex-grow rounded-l-lg border-gray-300 focus:ring-[#FF6B6B] focus:border-[#FF6B6B] focus:outline-none border-r-0">
+                        <button class="bg-[#212529] text-white px-4 py-2.5 rounded-r-lg font-bold hover:bg-[#FF6B6B] transition-colors self-stretch">&rarr;</button>
+                    </form>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-200 pt-8 text-center text-gray-500 text-sm">
+                &copy; <span id="copyright-year">2024</span> Zonvoordeel.nl - Alle rechten voorbehouden.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal-overlay" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden transition-opacity duration-300">
+        <div id="product-modal" class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl m-4 relative flex flex-col md:flex-row overflow-hidden max-h-[90vh]">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-black z-10">
+                <i class="gg-close" style="--ggs:1.5"></i>
+            </button>
+            <div class="w-full md:w-1/2 bg-gray-100 flex items-center justify-center p-4">
+                <img id="modal-product-image" src="" alt="Product" class="w-auto h-full max-h-[400px] object-contain">
+            </div>
+            <div class="w-full md:w-1/2 p-8 md:p-10 flex flex-col overflow-y-auto">
+                <span id="modal-product-brand" class="text-sm text-gray-500 font-medium uppercase tracking-wider"></span>
+                <h2 id="modal-product-name" class="text-3xl font-bold my-2"></h2>
+                <div class="flex items-baseline my-4">
+                    <span id="modal-product-price" class="text-4xl font-extrabold text-[#FF6B6B]"></span>
+                    <span id="modal-product-old-price" class="ml-3 text-gray-500 line-through text-lg"></span>
+                </div>
+                <p id="modal-product-description" class="text-gray-700 leading-relaxed"></p>
+                <div class="mt-auto pt-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                         <div class="quantity-selector flex items-center border border-gray-300 rounded-lg">
+                            <button class="quantity-minus p-3">-</button>
+                            <input type="text" value="1" readonly class="quantity-input w-12 text-center border-none bg-transparent focus:ring-0">
+                            <button class="quantity-plus p-3">+</button>
+                        </div>
+                        <button id="modal-add-to-cart-btn" class="flex-grow ml-4 bg-[#FF6B6B] text-white font-bold py-3 px-4 rounded-lg text-lg hover:bg-red-500 transform hover:scale-105 transition-all duration-300 shadow-lg">
+                            In winkelwagen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI CHATBOT 'Zonny' -->
+    <div id="chatbot-container" class="fixed bottom-5 right-5 z-[90] flex flex-col items-end">
+        <!-- Chat Window -->
+        <div id="chat-window" class="w-[calc(100vw-2.5rem)] max-w-md h-[70vh] max-h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col mb-4 hidden">
+            <div class="p-4 bg-gray-800 text-white rounded-t-2xl flex justify-between items-center flex-shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white p-1 rounded-full"><i data-lucide="sun" class="w-6 h-6 text-[#FF6B6B]"></i></div>
+                    <div>
+                        <h3 class="font-bold text-lg">Zonny</h3>
+                        <p class="text-sm opacity-90">Jouw AI zonnebrand-expert</p>
+                    </div>
+                </div>
+                <button id="close-chat-btn"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col space-y-4 min-h-0">
+                <!-- Messages will be injected here -->
+            </div>
+             <div id="chat-suggestions" class="p-4 border-t border-gray-200 flex flex-wrap gap-2 flex-shrink-0">
+                <!-- Suggestion chips will be injected here -->
+             </div>
+            <div class="p-4 bg-gray-50 border-t border-gray-200 flex-shrink-0">
+                <form id="chat-form" class="relative flex items-center">
+                    <input type="text" id="chat-input" placeholder="Stel je vraag..." class="w-full rounded-full border-gray-300 bg-white py-3 pl-4 pr-14 text-sm focus:ring-2 focus:ring-[#FF6B6B] focus:border-transparent transition-shadow">
+                    <button type="submit" class="absolute right-2 bg-[#FF6B6B] p-2.5 rounded-full text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B6B] transition-all duration-200 transform hover:scale-110">
+                        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!-- Chatbot Toggle Button -->
+        <button id="chatbot-toggle-btn" class="bg-[#FF6B6B] text-white p-4 rounded-full shadow-lg hover:bg-red-500 transform hover:scale-110 transition-all duration-300">
+            <i data-lucide="message-circle" class="w-8 h-8"></i>
+        </button>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- DATABASE VAN PRODUCTEN ---
+            const products = [
+                { id: '1', name: 'Anthelios Onzichtbare Spray SPF50+', price: 16.50, oldPrice: 24.95, brand: 'La Roche-Posay', category: 'Lichaam', image: 'https://images.unsplash.com/photo-1620916566398-39f1686d7fee?q=80&w=800&auto=format&fit=crop', description: 'Een ultra-lichte, niet-plakkerige spray die onmiddellijk intrekt. Biedt zeer hoge, breedspectrum bescherming en is speciaal ontwikkeld voor de gevoelige huid. Extreem waterbestendig.'},
+                { id: '2', name: 'Nivea Sun Protect & Hydrate SPF30', price: 12.75, oldPrice: 16.99, brand: 'Nivea Sun', category: 'Lichaam', image: 'https://images.unsplash.com/photo-1621588141445-43094b9121a2?q=80&w=800&auto=format&fit=crop', description: 'Hydraterende zonnemelk die de huid 48 uur lang hydrateert. De formule met Vitamine E helpt de huidbarrière te versterken. Trekt snel in en is waterbestendig.'},
+                { id: '3', name: 'Garnier Sensitive Expert+ Kids', price: 14.99, oldPrice: 24.99, brand: 'Garnier Ambre Solaire', category: 'Kinderen', image: 'https://images.unsplash.com/photo-1631024542234-8553dbaa2267?q=80&w=800&auto=format&fit=crop', description: 'Speciaal ontwikkeld voor de tere kinderhuid. Biedt zeer hoge bescherming en is hypoallergeen. Zonder parfum en kleurstoffen. Extra waterbestendig, perfect voor waterratjes.'},
+                { id: '4', name: 'Vision All Day Sun Protection', price: 19.95, oldPrice: 24.95, brand: 'Vision', category: 'Lichaam', image: 'https://images.unsplash.com/photo-1556912920-d3b2b8813534?q=80&w=800&auto=format&fit=crop', description: 'Biedt tot 8 uur lang bescherming met slechts één applicatie, dankzij de unieke Lyprosome technologie. Ideaal voor sporters en actieve dagen. Zweet- en waterbestendig.'},
+                { id: '5', name: 'Capital Soleil UV-Age Daily SPF50', price: 18.90, oldPrice: 26.50, brand: 'Vichy', category: 'Gezicht', image: 'https://images.unsplash.com/photo-1629198089985-c893952a488a?q=80&w=800&auto=format&fit=crop', description: 'Een ultralichte fluïde voor het gezicht die tekenen van huidveroudering door de zon tegengaat. Perfect voor dagelijks gebruik, ook onder make-up.'},
+                { id: '6', name: 'Eucerin Sun Oil Control Gel-Crème', price: 15.75, oldPrice: 21.00, brand: 'Eucerin', category: 'Gezicht', image: 'https://images.unsplash.com/photo-1601618210166-c95a05155986?q=80&w=800&auto=format&fit=crop', description: 'Speciaal voor de vette en acne-gevoelige huid. Geeft een langdurig anti-glans effect en heeft een talgregulerende werking.'},
+                { id: '7', name: 'Naïf Zonnebrandcrème Baby & Kind', price: 17.50, oldPrice: 21.99, brand: 'Naïf', category: 'Kinderen', image: 'https://images.unsplash.com/photo-1599847144222-205167332717?q=80&w=800&auto=format&fit=crop', description: 'Natuurlijke, minerale zonnebrandcrème zonder schadelijke ingrediënten. Perfect voor de allerkleinsten en extreem gevoelige huidjes.'},
+                { id: '8', name: 'Rituals The Ritual of Karma Sun Milk', price: 14.95, oldPrice: 18.50, brand: 'Rituals', category: 'Lichaam', image: 'https://images.unsplash.com/photo-1629007936647-9462584ef143?q=80&w=800&auto=format&fit=crop', description: 'Een luxe zonnemelk met de heerlijke geur van heilige lotus en witte thee. Hydrateert en beschermt, voor een zomerse glow.'}
+            ];
+             // Demo database for address autocomplete
+            const addressDatabase = [
+                { street: 'Oranjelaan 24a', postcode: '3971 JD', city: 'Driebergen-Rijsenburg' },
+                { street: 'Hoofdstraat 10', postcode: '3971 KC', city: 'Driebergen-Rijsenburg' },
+                { street: 'Kalverstraat 92', postcode: '1012 PH', city: 'Amsterdam' },
+                { street: 'Damrak 1', postcode: '1012 LG', city: 'Amsterdam' },
+                { street: 'Weena 740', postcode: '3014 DA', city: 'Rotterdam' },
+                { street: 'Coolsingel 105', postcode: '3012 AG', city: 'Rotterdam' },
+                { street: 'Neude 11', postcode: '3512 AE', city: 'Utrecht' },
+                { street: 'Lange Viestraat 2', postcode: '3511 BK', city: 'Utrecht' },
+                { street: 'Grote Markt 1', postcode: '9712 HN', city: 'Groningen' },
+                { street: 'Vismarkt 23', postcode: '9712 CA', city: 'Groningen' },
+                { street: 'Vrijthof 100', postcode: '6211 LE', city: 'Maastricht' },
+                { street: 'Plein 1992 15', postcode: '6221 JP', city: 'Maastricht' }
+            ];
+
+            // --- STATE ---
+            let cartItems = [];
+            let currentProductInModal = null;
+            let chatHistory = [];
+
+            // --- SELECTORS ---
+            const mainContent = document.getElementById('main-content');
+            const pages = document.querySelectorAll('.page');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const cartCountElement = document.getElementById('cart-count');
+            const modalOverlay = document.getElementById('product-modal-overlay');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const chatbotToggleButton = document.getElementById('chatbot-toggle-btn');
+            const chatWindow = document.getElementById('chat-window');
+            const closeChatBtn = document.getElementById('close-chat-btn');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+            const chatSuggestions = document.getElementById('chat-suggestions');
+            
+            // --- GEMINI API FUNCTIONS ---
+            async function getZonnyResponse(userMessage) {
+                const prompt = `Jij bent Zonny, de vrolijke en deskundige mascotte van Zonvoordeel.nl, een Nederlandse webshop die A-merk zonnebrand verkoopt voor de beste prijzen. Je toon is behulpzaam, positief en direct. Een klant stelt de volgende vraag: "${userMessage}". Geef een direct, conversationeel antwoord in het NEDERLANDS. Herhaal of parafraseer de vraag van de klant NIET. Geef gewoon het antwoord, alsof je een echte medewerker bent die reageert. Houd de antwoorden beknopt en duidelijk. Noem specifieke productnamen of typen als dat helpt.`;
+                
+                const limitedHistory = chatHistory.slice(-4); 
+                limitedHistory.push({ role: "user", parts: [{ text: prompt }] });
+                
+                const payload = { contents: limitedHistory };
+                const apiKey = ""; // API key is handled by the environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0) {
+                        const aiResponse = result.candidates[0].content.parts[0].text;
+                        chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+                        return aiResponse;
+                    }
+                    return "Oeps, er ging iets mis! Ik kon even geen antwoord voor je vinden. Probeer het later opnieuw.";
+                } catch (error) {
+                    console.error("Error fetching Zonny's response:", error);
+                    return "Sorry, ik heb even een zonnesteek en kan je vraag niet beantwoorden. Controleer je internetverbinding en probeer het zo weer!";
+                }
+            }
+
+
+            // --- UI FUNCTIONS ---
+            const createProductCard = (product) => {
+                const discount = Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
+                const card = document.createElement('div');
+                card.className = 'product-card bg-white rounded-2xl overflow-hidden cursor-pointer flex flex-col';
+                card.dataset.id = product.id;
+                
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-64 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x400/F8F9FA/FF6B6B?text=Beeld+komt+eraan';">
+                        <span class="absolute top-4 left-4 bg-[#FF6B6B] text-white text-xs font-bold px-3 py-1 rounded-full">-${discount}%</span>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <span class="text-sm text-gray-500 font-medium">${product.brand}</span>
+                        <h3 class="font-bold text-lg mt-1 flex-grow">${product.name}</h3>
+                        <div class="flex items-baseline mt-4">
+                            <span class="text-2xl font-extrabold text-[#FF6B6B]">€${product.price.toFixed(2)}</span>
+                            <span class="ml-2 text-gray-500 line-through">€${product.oldPrice.toFixed(2)}</span>
+                        </div>
+                        <button class="add-to-cart-btn w-full mt-4 bg-[#212529] text-white font-bold py-3 rounded-lg hover:bg-[#FF6B6B] transition-colors duration-300">
+                            In winkelwagen
+                        </button>
+                    </div>`;
+                return card;
+            };
+            
+            function showPage(pageId, data = {}) {
+                pages.forEach(p => p.classList.remove('active'));
+                const activePage = document.getElementById(pageId + '-page');
+                if (activePage) {
+                    activePage.classList.add('active', 'fade-in');
+                    window.scrollTo(0, 0);
+
+                    // Verberg header/footer op checkout pagina voor focus
+                    if (pageId === 'checkout') {
+                        document.getElementById('main-header').style.display = 'none';
+                        document.getElementById('main-footer').style.display = 'none';
+                        document.getElementById('chatbot-container').style.display = 'none';
+                        renderCheckoutSummary();
+                    } else {
+                        document.getElementById('main-header').style.display = 'block';
+                        document.getElementById('main-footer').style.display = 'block';
+                        document.getElementById('chatbot-container').style.display = 'flex';
+                    }
+
+                    if (pageId === 'categorie') {
+                        document.getElementById('categorie-title').textContent = `${data.category}`;
+                        const categoryGrid = document.getElementById('categorie-grid');
+                        categoryGrid.innerHTML = '';
+                        products.filter(p => p.category === data.category || p.brand === data.category).forEach(p => {
+                            categoryGrid.appendChild(createProductCard(p));
+                        });
+                        attachProductHandlers(categoryGrid);
+                    }
+                    if (pageId === 'winkelwagen') renderCart();
+                    if (pageId === 'deals') {
+                        const dealsGrid = document.getElementById('deals-grid');
+                        dealsGrid.innerHTML = '';
+                        products.forEach(p => dealsGrid.appendChild(createProductCard(p)));
+                        attachProductHandlers(dealsGrid);
+                    }
+                }
+            }
+            
+            function renderCart() {
+                const cartItemsContainer = document.getElementById('cart-items-container');
+                cartItemsContainer.innerHTML = ''; 
+                if (cartItems.length === 0) {
+                    cartItemsContainer.innerHTML = `
+                        <div class="text-center bg-white p-12 rounded-2xl shadow-lg">
+                            <p class="text-xl text-gray-600">Je winkelwagen is nog leeg.</p>
+                            <button class="nav-link mt-6 bg-[#FF6B6B] text-white font-bold py-3 px-8 rounded-full text-base" data-page="deals">
+                                Begin met shoppen
+                            </button>
+                        </div>`;
+                    attachNavHandlers(cartItemsContainer.querySelectorAll('.nav-link'));
+                    return;
+                }
+
+                const itemsHtml = cartItems.map(item => `
+                    <div class="flex items-center bg-white p-4 rounded-2xl shadow-sm mb-4 flex-wrap">
+                        <img src="${item.image}" alt="${item.name}" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/100x100/F8F9FA/FF6B6B?text=Beeld';">
+                        <div class="flex-grow ml-4">
+                            <h3 class="font-bold md:text-lg">${item.name}</h3>
+                            <p class="text-[#FF6B6B] font-extrabold text-lg md:text-xl">€${parseFloat(item.price).toFixed(2)}</p>
+                        </div>
+                        <div class="quantity-selector flex items-center border border-gray-200 rounded-lg mx-4 my-2 md:my-0">
+                            <button class="quantity-minus p-2 text-lg" data-id="${item.id}">-</button>
+                            <input type="text" value="${item.quantity}" readonly class="quantity-input w-10 text-center border-none bg-transparent focus:ring-0">
+                            <button class="quantity-plus p-2 text-lg" data-id="${item.id}">+</button>
+                        </div>
+                        <div class="text-right ml-auto">
+                            <p class="font-bold text-lg md:text-xl">€${(parseFloat(item.price) * item.quantity).toFixed(2)}</p>
+                            <button class="remove-from-cart text-gray-500 hover:text-red-500 mt-1" data-id="${item.id}">
+                                <i class="gg-trash"></i>
+                            </button>
+                        </div>
+                    </div>`).join('');
+                
+                const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                const shipping = 4.95;
+                const total = subtotal + shipping;
+
+                cartItemsContainer.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2">${itemsHtml}</div>
+                        <div class="lg:col-span-1">
+                            <div class="bg-white p-6 rounded-2xl shadow-lg sticky top-24">
+                                <h3 class="text-xl font-bold mb-4">Bestellingsoverzicht</h3>
+                                <div class="space-y-2 text-gray-600">
+                                    <div class="flex justify-between"><span>Subtotaal</span><span>€${subtotal.toFixed(2)}</span></div>
+                                    <div class="flex justify-between"><span>Verzendkosten</span><span>€${shipping.toFixed(2)}</span></div>
+                                    <div class="flex justify-between font-bold text-lg text-gray-800 border-t pt-2 mt-2"><span>Totaal</span><span>€${total.toFixed(2)}</span></div>
+                                </div>
+                                <button id="checkout-btn" class="w-full mt-6 bg-green-500 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-green-600 transition-colors">
+                                    Veilig afrekenen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                attachCartActionHandlers(cartItemsContainer);
+            }
+
+            function renderCheckoutSummary() {
+                const summaryContainer = document.getElementById('checkout-summary');
+                const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                const shipping = 4.95;
+                const total = subtotal + shipping;
+
+                const itemsHtml = cartItems.map(item => `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="relative">
+                                <img src="${item.image}" class="w-16 h-16 rounded-md object-cover" onerror="this.onerror=null;this.src='https://placehold.co/64x64/F8F9FA/FF6B6B?text=Beeld';">
+                                <span class="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-500 text-xs text-white">${item.quantity}</span>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium">${item.name}</h3>
+                                <p class="text-xs text-gray-500">${item.brand}</p>
+                            </div>
+                        </div>
+                        <p class="text-sm font-medium">€${(item.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                `).join('');
+
+                summaryContainer.innerHTML = `
+                    <div class="space-y-4">${itemsHtml}</div>
+                    <div class="my-6 border-t border-gray-200"></div>
+                    <div class="space-y-2 text-gray-600">
+                        <div class="flex justify-between"><span>Subtotaal</span><span>€${subtotal.toFixed(2)}</span></div>
+                        <div class="flex justify-between"><span>Verzendkosten</span><span>€${shipping.toFixed(2)}</span></div>
+                        <div class="flex justify-between font-bold text-lg text-gray-800 border-t pt-2 mt-2"><span>Totaal</span><span>€${total.toFixed(2)}</span></div>
+                    </div>
+                `;
+            }
+
+            function updateCart(product, quantity = 1) {
+                 if (product) {
+                    const existingItem = cartItems.find(item => item.id === product.id);
+                    if (existingItem) {
+                        existingItem.quantity += quantity;
+                    } else {
+                        cartItems.push({ ...product, quantity: quantity });
+                    }
+                 }
+                 cartItems = cartItems.filter(item => item.quantity > 0);
+                 
+                const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+                cartCountElement.textContent = totalQuantity;
+                cartCountElement.classList.add('transform', 'scale-125', 'transition-transform');
+                setTimeout(() => cartCountElement.classList.remove('transform', 'scale-125'), 200);
+            }
+            
+            function showProductModal(productId) {
+                currentProductInModal = products.find(p => p.id === productId);
+                if (!currentProductInModal) return;
+
+                document.getElementById('modal-product-image').src = currentProductInModal.image;
+                document.getElementById('modal-product-brand').textContent = currentProductInModal.brand;
+                document.getElementById('modal-product-name').textContent = currentProductInModal.name;
+                document.getElementById('modal-product-price').textContent = `€${currentProductInModal.price.toFixed(2)}`;
+                document.getElementById('modal-product-description').textContent = currentProductInModal.description;
+
+                document.querySelector('#product-modal .quantity-input').value = 1;
+                
+                const oldPriceEl = document.getElementById('modal-product-old-price');
+                if(currentProductInModal.oldPrice) {
+                    oldPriceEl.textContent = `€${currentProductInModal.oldPrice.toFixed(2)}`;
+                    oldPriceEl.classList.remove('hidden');
+                } else {
+                    oldPriceEl.classList.add('hidden');
+                }
+                
+                const modalCartBtn = document.getElementById('modal-add-to-cart-btn');
+                modalCartBtn.innerHTML = 'In winkelwagen'; // Reset button text
+                modalCartBtn.onclick = () => {
+                    const quantity = parseInt(document.querySelector('#product-modal .quantity-input').value);
+                    updateCart(currentProductInModal, quantity);
+                    modalCartBtn.innerHTML = 'Toegevoegd! &check;';
+                    setTimeout(() => modalCartBtn.innerHTML = 'In winkelwagen', 1500);
+                };
+                modalOverlay.classList.remove('hidden');
+            }
+
+            function closeProductModal() {
+                 modalOverlay.classList.add('hidden');
+                 currentProductInModal = null;
+            }
+
+            function attachNavHandlers(elements) {
+                elements.forEach(link => {
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        const pageId = this.dataset.page;
+                        if (!pageId) return;
+
+                        const pageData = { category: this.dataset.category || this.textContent };
+                        
+                        document.querySelectorAll('header .nav-link, footer .nav-link').forEach(l => l.classList.remove('active'));
+                        
+                        if (pageId !== 'contact' && pageId !== 'verzending' && pageId !== 'faq') {
+                           document.querySelectorAll(`header .nav-link[data-page="${pageId}"]`).forEach(activeLink => {
+                                if (!this.dataset.category || activeLink.dataset.category === this.dataset.category) {
+                                   activeLink.classList.add('active');
+                                }
+                           });
+                           if(pageId === 'home') document.querySelector('header .nav-link[data-page="home"]').classList.add('active');
+                        }
+
+
+                        showPage(pageId, pageData);
+                        if (mobileMenu && !mobileMenu.classList.contains('hidden')) mobileMenu.classList.add('hidden');
+                    });
+                });
+            }
+            
+            function attachProductHandlers(container) {
+                 container.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                    button.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        const card = this.closest('.product-card');
+                        const product = products.find(p => p.id === card.dataset.id);
+                        updateCart(product, 1);
+                        
+                        const originalText = this.innerHTML;
+                        this.innerHTML = 'Toegevoegd! &check;';
+                        this.disabled = true;
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.disabled = false;
+                        }, 2000);
+                    });
+                });
+
+                container.querySelectorAll('.product-card').forEach(card => {
+                    card.addEventListener('click', function(event) {
+                        if (event.target.closest('.add-to-cart-btn')) return;
+                        showProductModal(this.dataset.id);
+                    });
+                });
+            }
+            
+            function changeQuantity(productId, change) {
+                const item = cartItems.find(i => i.id === productId);
+                if (item) {
+                    item.quantity += change;
+                    if (item.quantity <= 0) {
+                        cartItems = cartItems.filter(i => i.id !== productId);
+                    }
+                    updateCart(); 
+                    if(document.getElementById('winkelwagen-page').classList.contains('active')) {
+                        renderCart(); 
+                    }
+                }
+            }
+            
+            function attachCartActionHandlers(container) {
+                 container.querySelectorAll('.quantity-plus').forEach(button => button.addEventListener('click', () => changeQuantity(button.dataset.id, 1)));
+                 container.querySelectorAll('.quantity-minus').forEach(button => button.addEventListener('click', () => changeQuantity(button.dataset.id, -1)));
+                 container.querySelectorAll('.remove-from-cart').forEach(button => button.addEventListener('click', () => {
+                     cartItems = cartItems.filter(i => i.id !== button.dataset.id);
+                     updateCart();
+                     renderCart();
+                 }));
+                 container.querySelector('#checkout-btn')?.addEventListener('click', () => showPage('checkout'));
+            }
+            
+            // --- CHATBOT FUNCTIONS ---
+            function scrollToChatBottom() {
+                 setTimeout(() => {
+                    chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            }
+
+            function addMessageToChat(text, sender) {
+                const messageContainer = document.getElementById('chat-messages');
+                const messageElement = document.createElement('div');
+                messageElement.className = `w-fit max-w-[90%] p-3 rounded-2xl ${sender === 'user' ? 'chat-bubble-user self-end' : 'chat-bubble-ai self-start'}`;
+                messageElement.innerText = text;
+                messageContainer.appendChild(messageElement);
+                scrollToChatBottom();
+            }
+
+            function showTypingIndicator() {
+                const typingElement = document.createElement('div');
+                typingElement.id = 'typing-indicator';
+                typingElement.className = 'chat-bubble-ai self-start p-3 rounded-2xl';
+                typingElement.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+                chatMessages.appendChild(typingElement);
+                scrollToChatBottom();
+            }
+
+            function removeTypingIndicator() {
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
+            
+            const handleUserQuery = async (message) => {
+                addMessageToChat(message, 'user');
+                chatHistory.push({ role: "user", parts: [{ text: message }] });
+                chatSuggestions.innerHTML = ''; 
+                chatSuggestions.classList.add('hidden');
+                showTypingIndicator();
+
+                const aiResponse = await getZonnyResponse(message);
+                removeTypingIndicator();
+                addMessageToChat(aiResponse, 'ai');
+
+                setTimeout(() => {
+                    addMessageToChat("Kan ik je nog ergens anders mee helpen?", 'ai');
+                    populateSuggestions(followUpSuggestions);
+                }, 1200);
+            };
+            
+            const initialSuggestions = ["Welke SPF heb ik nodig?", "Wat is het verschil tussen UVA en UVB?", "Hebben jullie ook iets voor een gevoelige huid?"];
+            const followUpSuggestions = ["Hoe zit het met de houdbaarheid?", "Verkopen jullie ook aftersun?", "Wat is jullie levertijd?"];
+            
+            function populateSuggestions(suggestions) {
+                chatSuggestions.innerHTML = '';
+                suggestions.forEach(text => {
+                    const button = document.createElement('button');
+                    button.className = 'suggestion-chip bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200';
+                    button.innerText = text;
+                    button.onclick = () => {
+                        handleUserQuery(text);
+                    };
+                    chatSuggestions.appendChild(button);
+                });
+                chatSuggestions.classList.remove('hidden');
+            }
+            
+            // --- PAYMENT SELECTION LOGIC ---
+            function setupPaymentSelection() {
+                const paymentOptions = document.querySelectorAll('.payment-option');
+                paymentOptions.forEach(option => {
+                    option.addEventListener('click', () => {
+                        // Reset all options
+                        paymentOptions.forEach(opt => {
+                            opt.setAttribute('aria-checked', 'false');
+                            const icon = opt.querySelector('i');
+                            if (icon) {
+                                icon.setAttribute('data-lucide', 'circle');
+                                icon.classList.remove('text-blue-600');
+                                icon.classList.add('text-gray-400');
+                            }
+                        });
+
+                        // Set the clicked option as active
+                        option.setAttribute('aria-checked', 'true');
+                        const icon = option.querySelector('i');
+                        if (icon) {
+                            icon.setAttribute('data-lucide', 'circle-dot');
+                            icon.classList.remove('text-gray-400');
+                            icon.classList.add('text-blue-600');
+                        }
+                        lucide.createIcons();
+                    });
+                     // Allow selection with Enter key for accessibility
+                    option.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.click(); });
+                });
+            }
+
+            // --- EVENT LISTENERS ---
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            document.querySelector('#product-modal .quantity-selector').addEventListener('click', function(e) {
+                const input = this.querySelector('.quantity-input');
+                let currentValue = parseInt(input.value);
+                if (e.target.classList.contains('quantity-plus')) {
+                    currentValue++;
+                } else if (e.target.classList.contains('quantity-minus')) {
+                    if (currentValue > 1) {
+                        currentValue--;
+                    }
+                }
+                input.value = currentValue;
+            });
+
+            closeModalBtn.addEventListener('click', closeProductModal);
+            modalOverlay.addEventListener('click', (event) => {
+                if (event.target === modalOverlay) closeProductModal();
+            });
+            
+            // Chatbot Listeners
+            chatbotToggleButton.addEventListener('click', () => {
+                chatWindow.classList.toggle('hidden');
+                if (!chatWindow.classList.contains('hidden')) {
+                    if (chatMessages.children.length === 0) {
+                        addMessageToChat("Hoi! Ik ben Zonny. Waarmee kan ik je helpen? ☀️", "ai");
+                        populateSuggestions(initialSuggestions);
+                    }
+                    setTimeout(() => chatInput.focus(), 100);
+                }
+            });
+
+            closeChatBtn.addEventListener('click', () => chatWindow.classList.add('hidden'));
+
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userMessage = chatInput.value.trim();
+                if (!userMessage) return;
+                chatInput.value = '';
+                handleUserQuery(userMessage);
+            });
+
+            // Address Autocomplete Listener
+            const addressInput = document.getElementById('checkout-address');
+            const suggestionsContainer = document.getElementById('address-suggestions');
+            addressInput.addEventListener('input', () => {
+                const query = addressInput.value.toLowerCase();
+                suggestionsContainer.innerHTML = '';
+                if (query.length < 3) {
+                    suggestionsContainer.classList.add('hidden');
+                    return;
+                }
+                const matches = addressDatabase.filter(addr => addr.street.toLowerCase().includes(query));
+                if (matches.length > 0) {
+                    matches.forEach(match => {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'address-suggestion';
+                        button.textContent = `${match.street}, ${match.city}`;
+                        button.onclick = () => {
+                            addressInput.value = match.street;
+                            document.getElementById('checkout-postcode').value = match.postcode;
+                            document.getElementById('checkout-plaats').value = match.city;
+                            suggestionsContainer.classList.add('hidden');
+                        };
+                        suggestionsContainer.appendChild(button);
+                    });
+                    suggestionsContainer.classList.remove('hidden');
+                } else {
+                    suggestionsContainer.classList.add('hidden');
+                }
+            });
+            
+            // --- INITIALISATIE ---
+            document.getElementById('copyright-year').textContent = new Date().getFullYear();
+            
+            const topDealsGrid = document.getElementById('top-deals-grid');
+            products.slice(0, 4).forEach(p => topDealsGrid.appendChild(createProductCard(p)));
+            
+            attachNavHandlers(document.querySelectorAll('.nav-link'));
+            attachProductHandlers(document.body);
+            setupPaymentSelection();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
